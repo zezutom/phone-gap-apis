@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <title>Accelerator</title>
+        <script type="text/javascript" src="cordova-2.5.0.js">
+        </script>
+        <script type="text/javascript" src="js/index.js">
+        </script>
+        <script type="text/javascript">
+            
+            // Wait for Cordova to load
+            document.addEventListener('deviceready', onDeviceReady, false);
+            
+            // Cordova is ready
+            function onDeviceReady(){
+                startWatch();
+            }
+            
+            // Start watching the acceleration
+            function startWatch(){
+                var previousReading = {
+                    x: 0,
+                    y: 0,
+                    z: 0
+                };
+                
+                watchID = navigator.accelerometer.watchAcceleration(function(acceleration){
+                    var changes = {}, bound = 0.05;
+                    
+                    if (previousReading.x !== null) {
+                        changes.x = Math.abs(previousReading.x, acceleration.x);
+                        changes.y = Math.abs(previousReading.y, acceleration.y);
+                        changes.z = Math.abs(previousReading.z, acceleration.z);
+						alert(changes.x + ':' + changes.y + ':' + changes.z);
+                    }
+					
+					if (changes.x > bound && changes.y > bound && changes.z > bound) {
+						shaken();
+					}
+					
+					previousReading = {
+						x: changes.x,
+						y: changes.y,
+						z: changes.z
+					};					
+                }, onError, { frequency: 2000});
+                
+            }
+            
+			function shaken() {
+				alert('shaken');
+			}
+			
+            // Stop watching the acceleration
+            function stopWatch(){
+                if (watchID) {
+                    navigator.accelerometer.clearWatch(watchID);
+                    watchID = null;
+                }
+            }
+                        
+            // onError: Failed to get the acceleration
+            function onError(){
+                alert('onError!');
+            }
+        </script>
+    </head>
+    <body>
+        <div id="accelerometer" style="font-size:20px; font-weight:bold;">
+            Waiting for accelerometer ..
+        </div>
+    </body>
+</html>
